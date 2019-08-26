@@ -1,0 +1,22 @@
+<html>
+
+<head>
+  <title>this is webview title</title>
+</head>
+
+<body id="print-body">
+</body>
+
+
+</html>
+<script>
+  onload = () => {
+    const { ipcRenderer } = require('electron')
+    //监听渲染线程传过来的webview-print-render事件
+    ipcRenderer.on('set-html-data', (event, args) => {
+      document.getElementById('print-body').innerHTML = args.data
+      // document.getElementById('print-body').style.width = args.length
+      ipcRenderer.send('do-print', args);
+    });
+  }
+</script>

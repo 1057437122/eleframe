@@ -1,0 +1,23 @@
+{
+  "name": "geat",
+  "version": "1.0.0",
+  "description": "Go-eat client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron --inspect=5858 .",
+    "build": "electron-builder . -mwl"
+  },
+  "keywords": [
+    "goeat",
+    "g-eat",
+    "go eat",
+    "geat"
+  ],
+  "author": "Baishun Li",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron-builder": "^21.2.0",
+    "electron": "^7.0.0-beta.3"
+  },
+  "dependencies": {}
+}
