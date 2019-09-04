@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron --inspect=5858 .",
-    "build": "electron-builder . -mwl"
+    "build": "electron-builder ."
   },
   "keywords": [
     "goeat",
@@ -16,8 +16,8 @@
   "author": "Baishun Li",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron-builder": "^21.2.0",
-    "electron": "^7.0.0-beta.3"
+    "electron": "3.1.12",
+    "electron-builder": "^21.2.0"
   },
   "dependencies": {}
 }

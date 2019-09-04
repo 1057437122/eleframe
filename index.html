@@ -3,31 +3,114 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>打印测试</title>
+  <title>客户端方法</title>
+  <style>
+
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
 
 <body>
-  <h1>这是一个测试 打开后请等待几秒钏 如果能使用默认打印机打印出来 则证明打印可用</h1>
+  <div id="app">
+    {{ clientInfo }}
+    <el-form ref="form" label-width="80px">
+      <el-form-item label="userData1">
+        <el-input v-model="userData1"></el-input>
+      </el-form-item>
+      <el-form-item label="userData2">
+        <el-input v-model="userData2"></el-input>
+      </el-form-item>
+      <el-form-item label="userData3">
+        <el-input v-model="userData3"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="setLocalData">保存</el-button>
+        <el-button>取消</el-button>
+      </el-form-item>
+    </el-form>
+    <hr>
+    <el-button type="primary" @click="showClientMessageBox">调用系统messageBox</el-button>
+    <el-button type="primary" @click="showSystemNotification">调用系统Notification</el-button>
+    <hr>
+    打印机信息{{ printerList }}<br>
+    <el-select v-model="printer" placeholder="请选择">
+      <el-option v-for="item in printerList" :key="item.name" :label="item.name" :value="item.name">
+      </el-option>
+    </el-select>
+    <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="dataToBePrint">
+    </el-input>
+    <el-button type="primary" @click="printWithSelected">使用选择的打印机打印</el-button>
 
-  <!-- You can also require other files to run in this process -->
+  </div>
+
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <script>
-    onload = () => {
-      setTimeout(() => {
-        window.getPrinterList((list) => {
-          console.log(list)
-          if (list) {
-            list.forEach((item, index) => {
-              if (item.isDefault) {
-                window.printData({ str: '<p><div style="text-align:center" ><strong>测试打印</strong></div></p><p>打印机描述:' + item.name + '</p>', deviceName: item.name, unique: '23456' }, (data) => {
-                  console.log(data)
-                  alert(data)
-                })
-              }
+    var app = new Vue({
+      el: '#app',
+      data: {
+        clientInfo: 'Hello Vue!',
+        clientInfo: null,
+        userData1: '',
+        userData2: '',
+        userData3: '',
+        printerList: [],
+        printer: '',
+        dataToBePrint: '<table><tr><td colspan="4" class="textfont">膳百味美食城</td></tr><tr><td colspan="4" class="text_middle_font">Calle de San Lorenzo,10</td></tr><tr><td colspan="4" class="text_middle_font">Tel: 666 555 444</td></tr><tr><td colspan="4" class="text_middle_font">CIF:B88287552</td></tr><tr><td colspan="4"><hr /></td></tr><tr><td colspan="2" class="text_left"> Factura simple: D17245</td><td colspan="2" class="text_right textfont">Juan555</td></tr><tr><td colspan="4" class="text_left"> 2019-08-98 12:12:12</td></tr><tr><td>Ref.</td><td>Can.</td><td>Desc.</td><td>Pre.</td></tr><tr><td>C14</td><td>4</td><td>大份牛肉水饺</td><td>14.25</td></tr><tr><td>C14</td><td>4</td><td>大份牛肉水饺</td><td>14.25</td></tr><tr><td>C14</td><td>4</td><td>大份牛肉水饺</td><td>14.25</td></tr><tr><td>C14</td><td>4</td><td>大份牛肉水饺</td><td>14.25</td></tr><tr><td>C14</td><td>4</td><td>大份牛肉水饺</td><td>14.25</td></tr><tr><td colspan="4" class="text_right">Base:24.25 €</td></tr><tr><td colspan="4" class="text_right">Iva:12.25 €</td></tr><tr><td colspan="4" class="text_right">Total:25.56 €</td></tr><tr><td colspan="4" class="text_right">Dto:12.55 €</td></tr><tr><td colspan="4" class="textfont">TOTAL: 25.65 €</td></tr><tr><td colspan="4">(Iva incluido)</td></tr><tr><td colspan="4"><hr /></td></tr><tr><td colspan="4">Gracias por su vista Hasta Pronto</td></tr><tr><td colspan="1" class="text_left textfont">D2564224</td><td colspan="2" class="text_right textfont">打印机</td></tr><tr><td colspan="4" class="textfont">Calle Cobo Calleja</td></tr><tr><td colspan="4" class="textfont">666 888 555</td></tr><tr><td colspan="4"><h2>现金支付 </h2></td></tr></table>'
+      },
+      methods: {
+        getLocalData() {
+          this.userData1 = window.getData('userData1');
+          this.userData2 = window.getData('userData2');
+          this.userData3 = window.getData('userData3');
+        },
+        setLocalData() {
+          window.setData('userData1', this.userData1)
+          window.setData('userData2', this.userData2)
+          window.setData('userData3', this.userData3)
+          this.getLocalData()
+        },
+        showClientMessageBox() {
+          const ret = window.showDialog({
+            type: 'info',
+            buttons: ['good', 'bad', 'cancel'],
+            defaultId: 0,
+            title: 'this is title',
+            message: 'please update your client',
+            detail: 'your client is expired plz update it now',
+            cancelId: 2,
+          })
+          if (ret === 0) {
+            alert('good button clicked')
+          }
+          if (ret === 1) {
+            alert('bad button clicked')
+          }
+          if (ret === 2) {
+            alert('cancel button clicked')
+            window.callSystemBrowser('http://www.baidu.com')
+          }
+        },
+        showSystemNotification() {
+          window.showNotification({ id: Math.floor((Math.random() * 1000) + 1), title: 'Notification', body: 'NotificationBody' }, (id) => {
+            alert('notification ' + id + 'clicked')
+          })
+        },
+        printWithSelected() {
+          if (this.printer) {
+            window.printData({ str: this.dataToBePrint, deviceName: this.printer, unique: Math.floor((Math.random() * 100000) + 1) }, (data) => {
+              alert(data)
             })
           }
-        });
-      }, 3000);
-    }
+        }
+      },
+      mounted() {
+        this.getLocalData()
+        this.clientInfo = window.clientInfo()
+        window.getPrinterList(list => this.printerList = list)
+      }
+    })
   </script>
 </body>
 
