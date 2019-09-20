@@ -55,9 +55,9 @@ function parseDataFile(filePath) {
 }
 
 function myEncrypt(str) {
-  console.log(str)
   const _base_str = Buffer.from(str);// new Buffer(str);
   const _base64ed_str = _base_str.toString('base64')
+
   return _base64ed_str
 }
 function myDecrypt(str) {

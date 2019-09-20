@@ -61,36 +61,45 @@
       },
       methods: {
         getLocalData() {
-          this.userData1 = window.getData('userData1');
-          this.userData2 = window.getData('userData2');
-          this.userData3 = window.getData('userData3');
+          if (window['getData']) {
+            this.userData1 = window.getData('userData1');
+            this.userData2 = window.getData('userData2');
+            this.userData3 = window.getData('userData3');
+          }
+
         },
         setLocalData() {
-          window.setData('userData1', this.userData1)
-          window.setData('userData2', this.userData2)
-          window.setData('userData3', this.userData3)
+          if (window['setData']) {
+            window.setData('userData1', this.userData1)
+            window.setData('userData2', this.userData2)
+            window.setData('userData3', this.userData3)
+          }
+
           this.getLocalData()
         },
         showClientMessageBox() {
-          const ret = window.showDialog({
-            type: 'info',
-            buttons: ['good', 'bad', 'cancel'],
-            defaultId: 0,
-            title: 'this is title',
-            message: 'please update your client',
-            detail: 'your client is expired plz update it now',
-            cancelId: 2,
-          })
-          if (ret === 0) {
-            alert('good button clicked')
+          if (window['showMessageBox']) {
+            const ret = window.showMessageBox({
+              type: 'info',
+              buttons: ['good', 'bad', 'cancel'],
+              defaultId: 0,
+              title: 'this is title',
+              message: 'please update your client',
+              detail: 'your client is expired plz update it now',
+              cancelId: 2,
+            })
+            if (ret === 0) {
+              alert('good button clicked')
+            }
+            if (ret === 1) {
+              alert('bad button clicked')
+            }
+            if (ret === 2) {
+              alert('cancel button clicked')
+              window.callSystemBrowser('http://www.baidu.com')
+            }
           }
-          if (ret === 1) {
-            alert('bad button clicked')
-          }
-          if (ret === 2) {
-            alert('cancel button clicked')
-            window.callSystemBrowser('http://www.baidu.com')
-          }
+
         },
         showSystemNotification() {
           window.showNotification({ id: Math.floor((Math.random() * 1000) + 1), title: 'Notification', body: 'NotificationBody' }, (id) => {
@@ -99,9 +108,12 @@
         },
         printWithSelected() {
           if (this.printer) {
-            window.printData({ str: this.dataToBePrint, deviceName: this.printer, unique: Math.floor((Math.random() * 100000) + 1) }, (data) => {
-              alert(data)
-            })
+            if (window['printData']) {
+              window.printData({ str: this.dataToBePrint, deviceName: this.printer, unique: Math.floor((Math.random() * 100000) + 1) }, (data) => {
+                alert(data)
+              })
+            }
+
           }
         }
       },

@@ -43,10 +43,10 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false)
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  // mainWindow.loadFile('index.html')
   // mainWindow.loadURL(`file://${__dirname}/caja/index.html`);
   // mainWindow.loadURL('http://127.0.0.1:1111/')
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -69,29 +69,49 @@ function createWindow() {
     });
     winprints.loadURL(`file://${__dirname}/assets/printTpl.html`);
 
-    winprints.webContents.openDevTools();
+    // winprints.webContents.openDevTools();
     winprints.webContents.on('did-finish-load', () => {
       winprints.webContents.send('set-html-data', args);
     });
 
-    ipcMain.on('do-print', (event, args) => {
-      //
-      winprints.webContents.print({ silent: true, printBackground: true, deviceName: args.deviceName }, (success) => {
-        if (success) {
-          // 应该使用主线程 ?
-          if (mainWindow) {
-            mainWindow.webContents.send('print-return-' + args.unique, 'success')
-            console.log('success')
-          }
-
-        } else {
-          if (mainWindow) {
-            console.log('error')
-            mainWindow.webContents.send('print-return-' + args.unique, 'error')
-          }
-
+    ipcMain.once('do-print', (event, args) => {
+      //@todu需要先判断该打印机存在不存在
+      const list = mainWindow.webContents.getPrinters()
+      let defaultPrinter = ''
+      let printerExists = false
+      let printDevice = args.deviceName
+      list.forEach((item) => {
+        if (item.name === args.deviceName) {
+          printerExists = true;
+          // printDevice  = args.devi
         }
-      });
+        if (item.isDefault) {
+          defaultPrinter = item.name;
+        }
+      })
+      if (!printerExists) {
+        printDevice = ''
+        if (defaultPrinter) {
+          printDevice = defaultPrinter
+        }
+      }
+      if (printDevice) {
+        winprints.webContents.print({ silent: true, printBackground: true, deviceName: printDevice }, (success) => {
+          if (success) {
+            // 应该使用主线程 ?
+            if (mainWindow) {
+              mainWindow.webContents.send('print-return-' + args.unique, 'success')
+            }
+          } else {
+            if (mainWindow) {
+              mainWindow.webContents.send('print-return-' + args.unique, 'error')
+            }
+          }
+        });
+      } else {
+        mainWindow.webContents.send('print-return-' + args.unique, 'error')
+      }
+
     })
   })
 }

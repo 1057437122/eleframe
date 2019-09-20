@@ -28,7 +28,7 @@ window.printData = (args, callback) => {
    * @param deviceName printer name
    */
   ipcRenderer.send('print-in-html', { data: args.str, deviceName: args.deviceName, unique: args.unique })
-  ipcRenderer.on('print-return-' + args.unique, (event, data) => {
+  ipcRenderer.once('print-return-' + args.unique, (event, data) => {
     callback && callback(data + '-' + args.unique)
   })
 }
@@ -58,7 +58,7 @@ window.setData = (key, val) => {
     cancelId: 2,
   }
  */
-window.showDialog = (args) => {
+window.showMessageBox = (args) => {
   return dialog.showMessageBox(args)
 }
 window.clientInfo = () => {
