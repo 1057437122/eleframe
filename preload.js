@@ -28,9 +28,10 @@ window.printData = (args, callback) => {
    * @param deviceName printer name
    */
   ipcRenderer.send('print-in-html', { data: args.str, deviceName: args.deviceName, unique: args.unique })
-  ipcRenderer.once('print-return-' + args.unique, (event, data) => {
-    callback && callback(data + '-' + args.unique)
-  })
+  callback && callback('success-' + args.unique)//@todu 
+  // ipcRenderer.once('print-return-' + args.unique, (event, data) => {
+  //   callback && callback(data + '-' + args.unique)
+  // })
 }
 /**
  * args:{key:}
@@ -48,7 +49,7 @@ window.setData = (key, val) => {
   store.set(key, val)
 }
 /**
- * arts= {
+ * args= {
     type: 'info',
     buttons: ['good', 'bad', 'cancel'],
     defaultId: 0,

@@ -2,11 +2,51 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const Store = require('./utils/store.js')
+const Queue = require('queue')
+const CronJob = require('cron').CronJob;
 
+let printQueue = []
 const store = new Store({
   // We'll call our data file 'user-preferences'
   configName: 'user-preferences'
 });
+
+
+function printData(args) {
+  printQueue.shift()
+  winprints = new BrowserWindow({
+    show: false,
+    title: args.unique,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  var html = [
+    "<html><head><title>",
+    args.unique,
+    "</title></head>",
+    "<body>",
+    args.data,
+    "</body></html>",
+  ].join("");
+  winprints.loadURL("data:text/html;charset=utf-8," + encodeURI(html));
+  // winprints.webContents.openDevTools()
+  winprints.webContents.on('did-finish-load', () => {
+    winprints.webContents.print({ silent: true, printBackground: true, deviceName: args.deviceName }, (success) => {
+    });
+  });
+
+}
+
+function cronJob() {
+  new CronJob('*/3 * * * * *', () => {
+    console.log('You will see this message every 3 second');
+    if (printQueue.length) {
+      printData(printQueue[0])
+    }
+  }, null, true, 'America/Los_Angeles');
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -37,9 +77,6 @@ function createWindow() {
     // Now that we have them, save them using the `set` method.
     store.set('windowBounds', JSON.stringify({ width, height }));
   });
-  // global.econsole = function (item) {
-  //   console.log(item)
-  // }
   mainWindow.setMenuBarVisibility(false)
 
   // and load the index.html of the app.
@@ -61,65 +98,17 @@ function createWindow() {
     mainWindow.webContents.send('recvPrinterList', list)
   })
   ipcMain.on('print-in-html', (event, args) => {
-    winprints = new BrowserWindow({
-      show: false,
-      webPreferences: {
-        nodeIntegration: true
-      }
-    });
-    winprints.loadURL(`file://${__dirname}/assets/printTpl.html`);
-
-    // winprints.webContents.openDevTools();
-    winprints.webContents.on('did-finish-load', () => {
-      winprints.webContents.send('set-html-data', args);
-    });
-
-    ipcMain.once('do-print', (event, args) => {
-      //@todu需要先判断该打印机存在不存在
-      const list = mainWindow.webContents.getPrinters()
-      let defaultPrinter = ''
-      let printerExists = false
-      let printDevice = args.deviceName
-      list.forEach((item) => {
-        if (item.name === args.deviceName) {
-          printerExists = true;
-          // printDevice  = args.devi
-        }
-        if (item.isDefault) {
-          defaultPrinter = item.name;
-        }
-      })
-      if (!printerExists) {
-        printDevice = ''
-        if (defaultPrinter) {
-          printDevice = defaultPrinter
-        }
-      }
-      if (printDevice) {
-        winprints.webContents.print({ silent: true, printBackground: true, deviceName: printDevice }, (success) => {
-          if (success) {
-            // 应该使用主线程 ?
-            if (mainWindow) {
-              mainWindow.webContents.send('print-return-' + args.unique, 'success')
-            }
-          } else {
-            if (mainWindow) {
-              mainWindow.webContents.send('print-return-' + args.unique, 'error')
-            }
-          }
-        });
-      } else {
-        mainWindow.webContents.send('print-return-' + args.unique, 'error')
-      }
-
-    })
+    printQueue.push(args)
   })
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow()
+  cronJob()
+})
 app.setAppUserModelId(process.execPath)
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {

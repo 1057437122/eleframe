@@ -19,5 +19,8 @@
     "electron": "3.1.12",
     "electron-builder": "^21.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cron": "^1.7.2",
+    "queue": "^6.0.1"
+  }
 }
