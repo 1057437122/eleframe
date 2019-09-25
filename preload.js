@@ -4,6 +4,7 @@
 const { ipcRenderer } = require('electron')
 const { dialog, app, shell } = require('electron').remote
 const Store = require('./utils/store.js')
+const Tools = require('./utils/tools.js')
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -29,9 +30,6 @@ window.printData = (args, callback) => {
    */
   ipcRenderer.send('print-in-html', { data: args.str, deviceName: args.deviceName, unique: args.unique })
   callback && callback('success-' + args.unique)//@todu 
-  // ipcRenderer.once('print-return-' + args.unique, (event, data) => {
-  //   callback && callback(data + '-' + args.unique)
-  // })
 }
 /**
  * args:{key:}
@@ -87,4 +85,14 @@ window.showNotification = (args, callback) => {
   myNotification.onclick = () => {
     callback && callback(args.id)
   }
+}
+/**
+ * 返回打包后的所有的日志
+ */
+window.getSystemLogZip = () => {
+  return Tools.zipAllSystemLog()
+}
+//清除所有的系统日志
+window.removeAllSystemLog = () => {
+  return Tools.removeAll()
 }

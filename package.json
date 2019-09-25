@@ -20,6 +20,7 @@
     "electron-builder": "^21.2.0"
   },
   "dependencies": {
+    "adm-zip": "^0.4.13",
     "cron": "^1.7.2",
     "queue": "^6.0.1"
   }
