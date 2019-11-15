@@ -1,4 +1,10 @@
 // Modules to control application life and create native browser window
+/**
+ * 上线需要处理的问题
+ * 1.目标地址
+ * 2.关掉开发者工具
+ * 3.删除没用的log等
+ */
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const Store = require('./utils/store.js')

@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>客户端方法</title>
+  <title>ClientMethods</title>
   <style>
 
   </style>
@@ -24,17 +24,17 @@
         <el-input v-model="userData3"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="setLocalData">保存</el-button>
-        <el-button>取消</el-button>
+        <el-button type="primary" @click="setLocalData">Save</el-button>
+        <el-button>Cancel</el-button>
       </el-form-item>
     </el-form>
     <hr>
-    <el-button type="primary" @click="showClientMessageBox">调用系统messageBox</el-button>
-    <el-button type="primary" @click="showSystemNotification">调用系统Notification</el-button>
-    <el-button type="primary" @click="getSystemLogPath">查看系统日志路径</el-button>
-    <el-button type="primary" @click="removeAllLog">删除所有日志</el-button>
+    <el-button type="primary" @click="showClientMessageBox">call system messageBox</el-button>
+    <el-button type="primary" @click="showSystemNotification">call system Notification</el-button>
+    <el-button type="primary" @click="getSystemLogPath">get System log path</el-button>
+    <el-button type="primary" @click="removeAllLog">delete all logs</el-button>
     <hr>
-    打印机信息{{ printerList }}<br>
+    printers info{{ printerList }}<br>
     <el-select v-model="printer" placeholder="请选择">
       <el-option v-for="item in printerList" :key="item.name" :label="item.name" :value="item.name">
       </el-option>
@@ -42,7 +42,7 @@
     <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="dataToBePrint">
     </el-input>
     <el-input v-model="cnt"></el-input>
-    <el-button type="primary" @click="printWithSelected">使用选择的打印机打印</el-button>
+    <el-button type="primary" @click="printWithSelected">Plz select printer</el-button>
 
   </div>
 
@@ -103,19 +103,25 @@
           }
         },
         showSystemNotification() {
-          window.showNotification({ id: Math.floor((Math.random() * 1000) + 1), title: 'Notification', body: 'NotificationBody' }, (id) => {
-            alert('notification ' + id + 'clicked')
-          })
+          if (window['showNotification']) {
+            window.showNotification({ id: Math.floor((Math.random() * 1000) + 1), title: 'Notification', body: 'NotificationBody' }, (id) => {
+              alert('notification ' + id + 'clicked')
+            })
+          }
+
         },
         printWithSelected() {
           if (this.printer) {
-            if (window['printData']) {
+            if (window['printData'] || window.printData) {
+              alert('found the method')
               for (i = 0; i < this.cnt; i++) {
                 window.printData({ str: this.dataToBePrint, deviceName: this.printer, unique: Math.floor((Math.random() * 100000) + 1) }, (data) => {
                   // alert(data)
                   console.log(data)
                 })
               }
+            } else {
+              alert('No printData found')
             }
           }
         },
@@ -134,8 +140,14 @@
       },
       mounted() {
         this.getLocalData()
-        this.clientInfo = window.clientInfo()
-        window.getPrinterList(list => this.printerList = list)
+        if (window['clientInfo']) {
+          this.clientInfo = window.clientInfo()
+        }
+        if (window['getPrinterList'] || window.getPrinterList) {
+          window.getPrinterList(list => this.printerList = list)
+        } else {
+          alert('No get printer list methods found')
+        }
       }
     })
   </script>
