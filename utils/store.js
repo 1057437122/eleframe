@@ -10,6 +10,7 @@ class Store {
      * opts:{configName:xxx,neecEncrypt:false}
      */
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+    console.log(userDataPath)
     // We'll use the `configName` property to set the file name and path.join to bring it all together as a string
     this.path = path.join(userDataPath, opts.configName + '.json');
 
@@ -18,6 +19,7 @@ class Store {
 
   // This will just return the property on the `data` object
   get(key) {
+    console.log('calling getting' + key);
     if (this.data[key]) {
       return myDecrypt(this.data[key]);
     }
